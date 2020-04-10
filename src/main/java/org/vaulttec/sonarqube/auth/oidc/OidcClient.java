@@ -186,7 +186,7 @@ public class OidcClient {
   }
 
   private Scope getScope() {
-    Scope scope = new Scope(OIDCScopeValue.OPENID, OIDCScopeValue.EMAIL, OIDCScopeValue.PROFILE);
+    Scope scope = new Scope(OIDCScopeValue.OPENID, OIDCScopeValue.PROFILE);
     Scope additionalScopes = Scope.parse(config.additionalScopes());
     if (additionalScopes != null) {
       additionalScopes.forEach(scope::add);

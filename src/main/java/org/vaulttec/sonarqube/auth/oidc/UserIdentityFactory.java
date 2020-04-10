@@ -48,7 +48,7 @@ public class UserIdentityFactory {
 
   public UserIdentity create(UserInfo userInfo) {
     UserIdentity.Builder builder = UserIdentity.builder().setProviderLogin(userInfo.getSubject().getValue())
-        .setLogin(getLogin(userInfo)).setName(getName(userInfo)).setEmail(userInfo.getEmailAddress());
+        .setLogin(getLogin(userInfo)).setName(getName(userInfo)).setEmail(userInfo.getStringClaim("mail"));
     if (config.syncGroups()) {
       builder.setGroups(getGroups(userInfo));
     }
@@ -66,11 +66,11 @@ public class UserIdentityFactory {
     case LOGIN_STRATEGY_PROVIDER_ID:
       return userInfo.getSubject().getValue();
     case LOGIN_STRATEGY_EMAIL:
-      if (userInfo.getEmailAddress() == null) {
+      if (userInfo.getStringClaim("mail") == null) {
         throw new IllegalStateException("Claim 'email' is missing in user info - "
             + "make sure your OIDC provider supports this claim in the id token or at the user info endpoint");
       }
-      return userInfo.getEmailAddress();
+      return userInfo.getStringClaim("mail");
     case LOGIN_STRATEGY_UNIQUE:
       return generateUniqueLogin(userInfo);
     case LOGIN_STRATEGY_CUSTOM_CLAIM:
@@ -90,7 +90,7 @@ public class UserIdentityFactory {
   }
 
   private String getName(UserInfo userInfo) {
-    String name = userInfo.getName() != null ? userInfo.getName() : userInfo.getPreferredUsername();
+    String name = userInfo.getStringClaim("SM_USER") != null ? userInfo.getStringClaim("SM_USER") : userInfo.getPreferredUsername();
     if (name == null) {
       throw new IllegalStateException("Claims 'name' and 'preferred_username' are missing in user info - "
           + "make sure your OIDC provider supports these claims in the id token or at the user info endpoint");
